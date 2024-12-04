@@ -1,6 +1,7 @@
 <?php
 include '../../controller/EvaluationController.php';
 
+
 $error = ""; // Variable pour afficher les erreurs si besoin
 
 // Si le formulaire est soumis
@@ -184,7 +185,7 @@ if (
                 <div id="error-idEnseignant" class="error-message"></div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Add Evaluation</button>
+            <button type="submit" class="btn btn-primary w-100">Add </button>
         </form>
     </div>
 
@@ -249,6 +250,7 @@ if (
             if (isValid) {
                 this.submit();
             }
+         
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

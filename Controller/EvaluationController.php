@@ -113,7 +113,7 @@ class EvaluationController
         }
     }
     public function getEvaluationById($id) {
-        $query = "SELECT * FROM evaluation WHERE id = :id ";
+        $query = "SELECT * FROM evaluation WHERE idEvaluation = :id ";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();

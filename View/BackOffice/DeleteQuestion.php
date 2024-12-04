@@ -1,29 +1,31 @@
 <?php
-include '../../controller/EvaluationController.php';
+include '../../controller/QuestionController.php';  // Inclure le contrôleur des questions
 
 // Messages pour affichage
 $errorMessage = "";
 $successMessage = "";
 
-
 // Traitement du formulaire de suppression
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['evaluationId'])) {
-    $evaluationId = $_POST['evaluationId'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['questionId'])) {
+    $questionId = $_POST['questionId'];
 
     // Vérifier que l'ID est valide
-    if (is_numeric($evaluationId)) {
+    if (is_numeric($questionId)) {
         try {
-            $evaluationController = new EvaluationController();
-            $evaluationController->deleteEvaluation($evaluationId);
+            $questionController = new QuestionController();
+            $questionController->deleteQuestion($questionId);
 
-            $successMessage = "L'évaluation avec l'ID $evaluationId a été supprimée avec succès.";
+            $successMessage = "La question avec l'ID $questionId a été supprimée avec succès.";
         } catch (Exception $e) {
             $errorMessage = "Erreur lors de la suppression : " . $e->getMessage();
+            header('Location: listEvaluation.php');
+            exit;
         }
     } else {
         $errorMessage = "ID invalide. Veuillez saisir un nombre.";
     }
-}
+
+}  
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['evaluationId'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete an Evaluation</title>
+    <title>Delete a Question</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -115,15 +117,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['evaluationId'])) {
 </head>
 <body>
     <div class="container">
-        <h1>Delete an Evaluation</h1>
+        <h1>Delete a Question</h1>
 
-        <!-- Error message (displayed by JavaScript) -->
-        <div id="error-message" class="error-message"></div>
+        <?php if ($successMessage): ?>
+            <div class="message success"><?= $successMessage; ?></div>
+        <?php endif; ?>
 
-        <!-- Form to enter the evaluation ID -->
+        <?php if ($errorMessage): ?>
+            <div class="message error"><?= $errorMessage; ?></div>
+        <?php endif; ?>
+
+        <!-- Form to enter the question ID -->
         <form id="deleteForm" method="POST" action="">
-            
-            <input type="number" id="evaluationId" name="evaluationId" required placeholder="Enter the evaluation ID">
+           
+            <input type="number" id="questionId" name="questionId" required placeholder="Enter the question ID">
             <button type="submit">Delete</button>
         </form>
     </div>
@@ -131,21 +138,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['evaluationId'])) {
     <script>
         // Select elements
         const form = document.getElementById('deleteForm');
-        const evaluationIdInput = document.getElementById('evaluationId');
+        const questionIdInput = document.getElementById('questionId');
         const errorMessageDiv = document.getElementById('error-message');
 
         // Add event listener to the form
         form.addEventListener('submit', function (e) {
-            const evaluationId = evaluationIdInput.value.trim();
+            const questionId = questionIdInput.value.trim();
 
             // Validation: check if the ID is a positive number
-            if (!evaluationId || isNaN(evaluationId) || evaluationId <= 0) {
+            if (!questionId || isNaN(questionId) || questionId <= 0) {
                 e.preventDefault(); // Prevent form submission
                 errorMessageDiv.textContent = "Please enter a valid ID (a positive number).";
             } else {
                 // Clear the error message
                 errorMessageDiv.textContent = "";
-                if (!confirm('Are you sure you want to delete this evaluation?')) {
+                if (!confirm('Are you sure you want to delete this question?')) {
                     e.preventDefault(); // Prevent submission if user cancels confirmation
                 }
             }

@@ -1,8 +1,7 @@
 <?php
-include '../../controller/EvaluationController.php'; // Inclure le contrôleur des évaluations
-$evaluationController = new EvaluationController();
-$list = $evaluationController->listEvaluations();
-
+include '../../controller/QuestionController.php'; // Inclure le contrôleur des questions
+$questionController = new QuestionController();
+$list = $questionController->listQuestions(); // Récupérer la liste des questions
 
 ?>
 
@@ -12,7 +11,7 @@ $list = $evaluationController->listEvaluations();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Evaluation List</title>
+    <title>Question List</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -56,7 +55,7 @@ $list = $evaluationController->listEvaluations();
 
         table th {
             background-color: #4e54c8;
-            color: #0000FF;
+            color: #ffffff;
         }
 
         table td {
@@ -96,40 +95,32 @@ $list = $evaluationController->listEvaluations();
 
 <body>
     <div class="container">
-        <h1>List Of Evaluations</h1>
+        <h1>List Of Questions</h1>
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th>Question ID</th>
+                    <th>Question Text</th>
+                    <th>Question Type</th>
                     <th>Evaluation ID</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Type</th>
-                    <th>Deadline</th>
-                    <th>Duration (min)</th>
-                    <th>Course ID</th>
-                    <th>Teacher ID</th>
                     <th colspan="2">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($list as $evaluation): ?>
+                <?php foreach ($list as $question): ?>
                     <tr>
-                        <td><?= $evaluation->getIdEvaluation(); ?></td>
-                        <td><?= $evaluation->getTitre(); ?></td>
-                        <td><?= $evaluation->getDescription(); ?></td>
-                        <td><?= $evaluation->getType(); ?></td>
-                        <td><?= $evaluation->getDateLimite(); ?></td>
-                        <td><?= $evaluation->getDuree(); ?></td>
-                        <td><?= $evaluation->getIdCours(); ?></td>
-                        <td><?= $evaluation->getIdEnseignant(); ?></td>
+                        <td><?= $question->getIdQuestion(); ?></td>
+                        <td><?= $question->getContenu(); ?></td>
+                        <td><?= $question->getType(); ?></td>
+                   
                         <td>
-                            <form method="POST" action="updateEvaluation.php">
+                            <form method="POST" action="updateQuestion.php">
                                 <input type="submit" name="update" value="Update" class="btn btn-warning btn-sm">
-                                <input type="hidden" value="<?= $evaluation->getIdEvaluation(); ?>" name="id">
+                                <input type="hidden" value="<?= $question->getIdQuestion(); ?>" name="id">
                             </form>
                         </td>
                         <td>
-                            <a href="#" onclick="confirmDelete(<?= $evaluation->getIdEvaluation(); ?>)" class="btn btn-danger btn-sm">Delete</a>
+                            <a href="#" onclick="confirmDelete(<?= $question->getIdQuestion(); ?>)" class="btn btn-danger btn-sm">Delete</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -140,10 +131,10 @@ $list = $evaluationController->listEvaluations();
     <script>
         // Function to confirm deletion
         function confirmDelete(id) {
-            const userConfirmed = confirm("Are you sure you want to delete this evaluation?");
+            const userConfirmed = confirm("Are you sure you want to delete this question?");
             if (userConfirmed) {
                 // Redirect to the delete URL if confirmed
-                window.location.href = `DeleteEvaluation.php?id=${id}`;
+                window.location.href = `DeleteQuestion.php?id=${id}`;
             }
         }
 
@@ -171,4 +162,3 @@ $list = $evaluationController->listEvaluations();
 </body>
 
 </html>
-
