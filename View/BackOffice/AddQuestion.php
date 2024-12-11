@@ -6,41 +6,36 @@ $error = ""; // Pour afficher les erreurs si nécessaire
 if (
     isset($_POST["contenu"]) && isset($_POST["type"]) &&
     isset($_POST["options"]) && isset($_POST["bonneReponse"]) &&
-    isset($_POST["points"])
+    isset($_POST["points"]) && isset($_POST["idEvaluation"]) // Vérifiez aussi idEvaluation
 ) {
-    // Vérification que tous les champs sont remplis
     if (
         !empty($_POST["contenu"]) && !empty($_POST["type"]) &&
-        !empty($_POST["bonneReponse"]) && !empty($_POST["points"])
+        !empty($_POST["bonneReponse"]) && !empty($_POST["points"]) &&
+        !empty($_POST["idEvaluation"]) // Assurez-vous que ce champ est rempli
     ) {
-        // Préparer les données
-        $contenu = $_POST["contenu"];
-        $type = $_POST["type"];
-        $options = !empty($_POST["options"]) ? explode(',', $_POST["options"]) : []; // Les options, séparées par des virgules
-        $bonneReponse = $_POST["bonneReponse"];
-        $points = (int)$_POST["points"];
-
-        // Créer une nouvelle instance de Question
+        // Récupération des données
+        $idEvaluation = (int)$_POST["idEvaluation"];
         $question = new Question(
-            null, // L'ID sera généré automatiquement
-            $contenu,
-            $type,
-            $options,
-            $bonneReponse,
-            $points
+            null,
+            $_POST["contenu"],
+            $_POST["type"],
+            !empty($_POST["options"]) ? explode(',', $_POST["options"]) : [],
+            $_POST["bonneReponse"],
+            (int)$_POST["points"],
+            $idEvaluation // Ajoutez l'ID de l'évaluation
         );
 
-        // Appeler le contrôleur pour ajouter la question
         $questionController = new QuestionController();
         $questionController->addQuestion($question);
 
-        // Redirection ou message de succès
-        header('Location: listQuestion.php'); // Modifier selon votre structure
+        header('Location: ListQuestion.php');
         exit;
     } else {
         $error = "Veuillez remplir tous les champs.";
     }
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -57,7 +52,7 @@ if (
             align-items: center;
             justify-content: center;
             font-family: 'Arial', sans-serif;
-            color: #ffffff;
+            color: #0052cc;
             margin: 0;
         }
         .form-container {
@@ -103,40 +98,47 @@ if (
         <h1>Add Question</h1>
 
         <!-- Formulaire -->
-        <form id="questionForm" action="addQuestion.php" method="POST" onsubmit="return validateForm()">
+        <form id="questionForm" action="AddQuestion.php" method="POST" onsubmit="return validateForm()">
             <div class="form-group">
-                <label for="contenu">Contenu de la Question</label>
-                <textarea class="form-control" name="contenu" id="contenu" placeholder="Entrez le contenu de la question" required></textarea>
+                <label for="contenu">Content</label>
+                <textarea class="form-control" name="contenu" id="contenu" placeholder="Enter the content" required></textarea>
                 <div id="error-contenu" class="error-message"></div>
             </div>
 
             <div class="form-group">
-                <label for="type">Type de Question</label>
+                <label for="type">Type</label>
                 <select class="form-select" name="type" id="type" required>
-                    <option value="" disabled selected>-- Sélectionnez un type --</option>
-                    <option value="choix_multiples">Choix Multiples</option>
-                    <option value="vrai_faux">Vrai/Faux</option>
-                    <option value="reponse_courte">Réponse Courte</option>
+                    <option value="" disabled selected>-- Select a type --</option>
+                    <option value="Multiple Choice">Multiple Choice</option>
+                    <option value="True/False">True/False</option>
+                    <option value="Short Answer">Short Answer</option>
                 </select>
                 <div id="error-type" class="error-message"></div>
             </div>
 
             <div class="form-group">
-                <label for="options">Options (séparées par des virgules)</label>
+                <label for="options">Options </label>
                 <input type="text" class="form-control" name="options" id="options" placeholder="Option1,Option2,Option3">
             </div>
 
             <div class="form-group">
-                <label for="bonneReponse">Bonne Réponse</label>
-                <input type="text" class="form-control" name="bonneReponse" id="bonneReponse" placeholder="Entrez la bonne réponse" required>
+                <label for="bonneReponse">Correct answer</label>
+                <input type="text" class="form-control" name="bonneReponse" id="bonneReponse" placeholder="Enter the answer" required>
                 <div id="error-bonneReponse" class="error-message"></div>
             </div>
 
             <div class="form-group">
                 <label for="points">Points</label>
-                <input type="number" class="form-control" name="points" id="points" placeholder="Nombre de points" min="1" required>
+                <input type="number" class="form-control" name="points" id="points" placeholder="Enter the points" min="1" required>
                 <div id="error-points" class="error-message"></div>
             </div>
+
+            <div class="form-group">
+    <label for="idEvaluation">Evaluation ID</label>
+    <input type="number" class="form-control" name="idEvaluation" id="idEvaluation" placeholder="Enter the evaluation ID" required>
+    <div id="error-idEvaluation" class="error-message"></div>
+</div>
+
 
             <button type="submit" class="btn btn-primary w-100">Add</button>
         </form>

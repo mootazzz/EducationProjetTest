@@ -1,4 +1,5 @@
 <?php
+if(!class_exists("config")){
 class config
 {   private static $pdo = null;
     public static function getConnexion()
@@ -24,6 +25,7 @@ class config
         }
         return self::$pdo;
     }
+}
 }
 config::getConnexion();
 ?>

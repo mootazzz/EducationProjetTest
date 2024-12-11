@@ -1,162 +1,28 @@
 <?php
-include '../../controller/QuestionController.php';  // Inclure le contrôleur des questions
+include '../../controller/QuestionController.php';  // Assurez-vous que ce fichier existe et qu'il contient la méthode de suppression
 
-// Messages pour affichage
-$errorMessage = "";
-$successMessage = "";
+// Vérifiez que l'ID est passé via GET et qu'il est valide
+if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
+    $questionId = intval($_GET["id"]);  // Récupérer et convertir l'ID de la question
 
-// Traitement du formulaire de suppression
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['questionId'])) {
-    $questionId = $_POST['questionId'];
+    try {
+        // Instancier le contrôleur
+        $questionController = new QuestionController();
+        
+        // Appeler la méthode de suppression de la question
+        $questionController->deleteQuestion($questionId);
 
-    // Vérifier que l'ID est valide
-    if (is_numeric($questionId)) {
-        try {
-            $questionController = new QuestionController();
-            $questionController->deleteQuestion($questionId);
-
-            $successMessage = "La question avec l'ID $questionId a été supprimée avec succès.";
-        } catch (Exception $e) {
-            $errorMessage = "Erreur lors de la suppression : " . $e->getMessage();
-            header('Location: listEvaluation.php');
-            exit;
-        }
-    } else {
-        $errorMessage = "ID invalide. Veuillez saisir un nombre.";
+        // Redirection vers la liste des questions après suppression
+        header('Location: listQuestion.php');  // Remplacez 'listQuestions.php' par la page où vous listez vos questions
+        exit();  // Arrêter l'exécution après la redirection
+    } catch (Exception $e) {
+        // En cas d'erreur, affichez un message ou redirigez avec un message d'erreur
+        echo "Erreur lors de la suppression de la question : " . $e->getMessage();
     }
-
-}  
+} else {
+    // Si l'ID est invalide ou non fourni, affichez une erreur ou redirigez
+    echo "ID invalide ou non fourni.";
+}
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete a Question</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #3a8dff, #7c4dff);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
 
-        .container {
-            background-color: #fff;
-            color: #333;
-            border-radius: 15px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px;
-            padding: 30px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #3a8dff;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .success {
-            background-color: #e1f5e1;
-            color: #4CAF50;
-        }
-
-        .error {
-            background-color: #ffebee;
-            color: #F44336;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #3a8dff;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        button:hover {
-            background-color: #2370e1;
-        }
-
-        .error-message {
-            color: #F44336;
-            font-size: 14px;
-            margin-top: -15px;
-            margin-bottom: 15px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Delete a Question</h1>
-
-        <?php if ($successMessage): ?>
-            <div class="message success"><?= $successMessage; ?></div>
-        <?php endif; ?>
-
-        <?php if ($errorMessage): ?>
-            <div class="message error"><?= $errorMessage; ?></div>
-        <?php endif; ?>
-
-        <!-- Form to enter the question ID -->
-        <form id="deleteForm" method="POST" action="">
-           
-            <input type="number" id="questionId" name="questionId" required placeholder="Enter the question ID">
-            <button type="submit">Delete</button>
-        </form>
-    </div>
-
-    <script>
-        // Select elements
-        const form = document.getElementById('deleteForm');
-        const questionIdInput = document.getElementById('questionId');
-        const errorMessageDiv = document.getElementById('error-message');
-
-        // Add event listener to the form
-        form.addEventListener('submit', function (e) {
-            const questionId = questionIdInput.value.trim();
-
-            // Validation: check if the ID is a positive number
-            if (!questionId || isNaN(questionId) || questionId <= 0) {
-                e.preventDefault(); // Prevent form submission
-                errorMessageDiv.textContent = "Please enter a valid ID (a positive number).";
-            } else {
-                // Clear the error message
-                errorMessageDiv.textContent = "";
-                if (!confirm('Are you sure you want to delete this question?')) {
-                    e.preventDefault(); // Prevent submission if user cancels confirmation
-                }
-            }
-        });
-    </script>
-</body>
-</html>

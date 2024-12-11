@@ -1,9 +1,7 @@
-<?php
-include '../../controller/EvaluationController.php'; // Inclure le contrôleur des évaluations
+<?php 
+include 'C:\xampp\htdocs\EducationProjetTest - testlekher\Controller\EvaluationController.php'; // Inclure le contrôleur des évaluations
 $evaluationController = new EvaluationController();
 $list = $evaluationController->listEvaluations();
-
-
 ?>
 
 <!DOCTYPE html>
@@ -44,53 +42,106 @@ $list = $evaluationController->listEvaluations();
         table {
             width: 100%;
             border-collapse: collapse;
+            border: 4px solid black;
         }
 
         table th,
         table td {
             padding: 15px;
             text-align: center;
-            border: 1px solid #ddd;
+            border: 4px solid black;
             font-size: 1rem;
         }
 
         table th {
-            background-color: #4e54c8;
-            color: #0000FF;
+            background-color: #0052cc;
+            color: #0052cc;
+            font-weight: bold;
         }
 
         table td {
-            background-color: #f5f5f5;
+            background-color: #f9f9f9;
         }
 
-        table td a,
-        table td input[type="submit"] {
-            font-size: 0.9rem;
-            padding: 8px 15px;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: 0.3s;
+        table tr:nth-child(even) td {
+            background-color: #f1f1f1;
         }
 
-        .btn-warning {
-            background-color: #ffb74d;
-            color: #fff;
-            font-weight: bold;
+        table tr:hover td {
+            background-color: #66b2ff;
+            transition: background-color 0.3s;
         }
 
-        .btn-warning:hover {
-            background-color: #ff9800;
-        }
+    table td a,
+    table td input[type="submit"] {
+    font-size: 0.9rem;
+    width: 120px; /* Largeur fixe pour uniformiser les boutons */
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    border: 2px solid white; /* Contour noir par défaut */
+    color: white; /* Texte blanc */
+    }
 
-        .btn-danger {
-            background-color: #e57373;
-            color: #fff;
-            font-weight: bold;
-        }
+    /* Bouton d'avertissement (warning) */
+    .btn-warning {
+    background-color: #66b2ff;
+    color: white; /* Texte blanc */
+    border: 2px solid black; /* Contour noir par défaut */
+    }
 
-        .btn-danger:hover {
-            background-color: #f44336;
-        }
+    .btn-warning:hover {
+    background-color: #0052cc;
+    border: 2px solid white; /* Contour blanc au survol */
+    color: white; /* Texte blanc au survol */
+    }
+
+    .btn-warning:active {
+    background-color: #0052cc; /* Couleur au clic (lorsque le bouton est enfoncé) */
+    border: 2px solid white; /* Contour blanc maintenu après le clic */
+    color: white; /* Texte blanc maintenu */
+    }
+
+    /* Bouton de danger (danger) */
+    .btn-danger {
+    background-color: #66b2ff;
+    color: white; /* Texte blanc */
+    border: 2px solid black; /* Contour noir par défaut */
+    }
+
+    .btn-danger:hover {
+    background-color: #0052cc;
+    border: 2px solid white; /* Contour blanc au survol */
+    color: white; /* Texte blanc au survol */
+    }
+
+    .btn-danger:active {
+    background-color: #0052cc; /* Couleur au clic (lorsque le bouton est enfoncé) */
+    border: 2px solid white; /* Contour blanc maintenu après le clic */
+    color: white; /* Texte blanc maintenu */
+    }
+
+    /* Bouton d'information (info) */
+    .btn-info {
+    background-color: #66b2ff;
+    color: white; /* Texte blanc */
+    border: 2px solid black; /* Contour noir par défaut */
+    }
+
+    .btn-info:hover {
+    background-color: #0052cc;
+    border: 2px solid white; /* Contour blanc au survol */
+    color: white; /* Texte blanc au survol */
+    }
+
+    .btn-info:active {
+    background-color: #3399cc; /* Couleur au clic (lorsque le bouton est enfoncé) */
+    border: 2px solid white; /* Contour blanc maintenu après le clic */
+    color: white; /* Texte blanc maintenu */
+    } 
+
     </style>
 </head>
 
@@ -108,7 +159,7 @@ $list = $evaluationController->listEvaluations();
                     <th>Duration (min)</th>
                     <th>Course ID</th>
                     <th>Teacher ID</th>
-                    <th colspan="2">Actions</th>
+                    <th colspan="3">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -123,13 +174,18 @@ $list = $evaluationController->listEvaluations();
                         <td><?= $evaluation->getIdCours(); ?></td>
                         <td><?= $evaluation->getIdEnseignant(); ?></td>
                         <td>
-                            <form method="POST" action="updateEvaluation.php">
-                                <input type="submit" name="update" value="Update" class="btn btn-warning btn-sm">
-                                <input type="hidden" value="<?= $evaluation->getIdEvaluation(); ?>" name="id">
-                            </form>
+                        <form method="POST" action="updateEvaluation.php">
+                        <!-- Remplacer l'input par un bouton -->
+                            <button type="submit" name="update" class="btn btn-warning btn-sm">Update</button>
+                              <input type="hidden" value="<?= $evaluation->getIdEvaluation(); ?>" name="id">
+                        </form>
                         </td>
+
                         <td>
                             <a href="#" onclick="confirmDelete(<?= $evaluation->getIdEvaluation(); ?>)" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                        <td>
+                            <a href="viewQuestions.php?id=<?= $evaluation->getIdEvaluation(); ?>" class="btn btn-info btn-sm">View Questions</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -143,32 +199,12 @@ $list = $evaluationController->listEvaluations();
             const userConfirmed = confirm("Are you sure you want to delete this evaluation?");
             if (userConfirmed) {
                 // Redirect to the delete URL if confirmed
-                window.location.href = `DeleteEvaluation.php?id=${id}`;
+                window.location.href = "DeleteEvaluation.php?id=" + id;
             }
         }
-
-        // Example validation for the update form (if fields are editable in the form)
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                const inputs = form.querySelectorAll('input, select, textarea');
-                let isValid = true;
-
-                inputs.forEach(input => {
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        alert(`Please fill the ${input.name} field.`);
-                        input.focus();
-                    }
-                });
-
-                if (!isValid) {
-                    event.preventDefault(); // Prevent form submission if validation fails
-                }
-            });
-        });
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
-

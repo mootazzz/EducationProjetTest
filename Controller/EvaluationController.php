@@ -152,6 +152,31 @@ class EvaluationController
             die('Error: ' . $e->getMessage());
         }
     }
+
+    public function listEvaluationsWithQuestions()
+    {
+        try {
+            $evaluationsWithQuestions = Evaluation::getEvaluationsWithQuestions();
+            include(__DIR__ . '/../View/evaluations_with_questions.php'); // Inclut la vue
+        } catch (Exception $e) {
+            die('Error: ' . $e->getMessage());
+        }
+    }
+
+
+
+    public function listQuestionsByEvaluation($idEvaluation) {
+        // Logique pour récupérer les questions de l'évaluation par ID
+        $query = "SELECT * FROM questions WHERE idEvaluation = :idEvaluation";
+        $db = config::getConnexion(); // Utilisation de la méthode pour obtenir la connexion
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':idEvaluation', $idEvaluation, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retourne les résultats sous forme de tableau associatif
+    }
+    
+    
+    
     
     
 }

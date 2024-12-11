@@ -12,22 +12,20 @@ class QuestionController
         try {
             $liste = $db->query($sql);
             $questions = [];
-            if ($liste->rowCount() > 0) {
-                foreach ($liste->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                    $question = new Question(
-                        $row['idQuestion'],
-                        $row['contenu'],
-                        $row['type'],
-                        json_decode($row['options'], true), // Décoder le JSON en tableau PHP
-                        $row['bonne_reponse'],
-                        $row['points']
-                    );
-                    $questions[] = $question;
-                }
+            foreach ($liste->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $questions[] = new Question(
+                    $row['idQuestion'],
+                    $row['contenu'],
+                    $row['type'],
+                    json_decode($row['options'], true), // Décoder les options JSON
+                    $row['bonne_reponse'],
+                    $row['points'],
+                    $row['idEvaluation'] // Ajout de idEvaluation
+                );
             }
             return $questions;
-        } catch (Exception $e) {
-            die('Error: ' . $e->getMessage());
+        } catch (PDOException $e) {
+            throw new Exception('Erreur lors de la récupération des questions : ' . $e->getMessage());
         }
     }
 
@@ -36,60 +34,65 @@ class QuestionController
     {
         $sql = "DELETE FROM questions WHERE idQuestion = :id";
         $db = config::getConnexion();
-        $req = $db->prepare($sql);
-        $req->bindValue(':id', $id);
-
         try {
+            $req = $db->prepare($sql);
+            $req->bindValue(':id', $id, PDO::PARAM_INT);
             $req->execute();
-        } catch (Exception $e) {
-            die('Error: ' . $e->getMessage());
+        } catch (PDOException $e) {
+            throw new Exception('Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
 
     // Ajoute une nouvelle question
-    public function addQuestion($question)
+    public function addQuestion(Question $question)
     {
-        $sql = "INSERT INTO questions (contenu, type, options, bonne_reponse, points) 
-                VALUES (:contenu, :type, :options, :bonneReponse, :points)";
+        $sql = "
+            INSERT INTO questions (contenu, type, options, bonne_reponse, points, idEvaluation)
+            VALUES (:contenu, :type, :options, :bonne_reponse, :points, :idEvaluation)
+        ";
         $db = config::getConnexion();
-
         try {
             $query = $db->prepare($sql);
-            $query->bindParam(':contenu', $question->getContenu());
-            $query->bindParam(':type', $question->getType());
-            $query->bindParam(':options', json_encode($question->getOptions())); // Encoder en JSON
-            $query->bindParam(':bonneReponse', $question->getBonneReponse());
-            $query->bindParam(':points', $question->getPoints());
-            $query->execute();
-        } catch (Exception $e) {
-            echo 'Error: ' . $e->getMessage();
+            $query->execute([
+                'contenu' => $question->getContenu(),
+                'type' => $question->getType(),
+                'options' => json_encode($question->getOptions()), // Encodage en JSON
+                'bonne_reponse' => $question->getBonneReponse(),
+                'points' => $question->getPoints(),
+                'idEvaluation' => $question->getIdEvaluation(), // Ajout de idEvaluation
+            ]);
+        } catch (PDOException $e) {
+            throw new Exception('Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
 
     // Modifie une question existante
-    public function updateQuestion($question, $id)
+    public function updateQuestion(Question $question, $id)
     {
+        $sql = "
+            UPDATE questions SET 
+                contenu = :contenu,
+                type = :type,
+                options = :options,
+                bonne_reponse = :bonne_reponse,
+                points = :points,
+                idEvaluation = :idEvaluation
+            WHERE idQuestion = :id
+        ";
+        $db = config::getConnexion();
         try {
-            $db = config::getConnexion();
-            $query = $db->prepare(
-                'UPDATE questions SET 
-                    contenu = :contenu,
-                    type = :type,
-                    options = :options,
-                    bonne_reponse = :bonneReponse,
-                    points = :points
-                WHERE idQuestion = :id'
-            );
-            $query->bindParam(':id', $id);
-            $query->bindParam(':contenu', $question->getContenu());
-            $query->bindParam(':type', $question->getType());
-            $query->bindParam(':options', json_encode($question->getOptions()));
-            $query->bindParam(':bonneReponse', $question->getBonneReponse());
-            $query->bindParam(':points', $question->getPoints());
-            $query->execute();
-            echo $query->rowCount() . " record(s) UPDATED successfully<br>";
+            $query = $db->prepare($sql);
+            $query->execute([
+                'contenu' => $question->getContenu(),
+                'type' => $question->getType(),
+                'options' => json_encode($question->getOptions()), // Encodage en JSON
+                'bonne_reponse' => $question->getBonneReponse(),
+                'points' => $question->getPoints(),
+                'idEvaluation' => $question->getIdEvaluation(), // Ajout de idEvaluation
+                'id' => $id,
+            ]);
         } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
+            throw new Exception('Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
 
@@ -100,7 +103,7 @@ class QuestionController
         $db = config::getConnexion();
         try {
             $query = $db->prepare($sql);
-            $query->bindValue(':id', $id);
+            $query->bindValue(':id', $id, PDO::PARAM_INT);
             $query->execute();
             $data = $query->fetch(PDO::FETCH_ASSOC);
 
@@ -111,13 +114,24 @@ class QuestionController
                     $data['type'],
                     json_decode($data['options'], true), // Décoder les options JSON
                     $data['bonne_reponse'],
-                    $data['points']
+                    $data['points'],
+                    $data['idEvaluation'] // Ajout de idEvaluation
                 );
             }
-            return null;
-        } catch (Exception $e) {
-            die('Error: ' . $e->getMessage());
+            return null; // Si aucune question n'est trouvée
+        } catch (PDOException $e) {
+            throw new Exception('Erreur lors de la récupération : ' . $e->getMessage());
         }
     }
+
+    public function getAllQuestions()
+{
+    $sql = "SELECT * FROM questions"; // Adapter selon votre table
+    $stmt = config::getConnexion()->query($sql);
+    return $stmt->fetchAll(); // Retourne toutes les questions
 }
+
+}
+
+
 ?>

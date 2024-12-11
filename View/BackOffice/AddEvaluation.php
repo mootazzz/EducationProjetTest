@@ -1,5 +1,5 @@
 <?php
-include '../../controller/EvaluationController.php';
+include 'C:\xampp\htdocs\EducationProjetTest - testlekher\Controller\EvaluationController.php'; // Inclure le contrôleur des évaluations
 
 
 $error = ""; // Variable pour afficher les erreurs si besoin
@@ -33,7 +33,7 @@ if (
         $evaluationController->addEvaluation($evaluation);
 
         // Redirection après ajout réussi
-        header('Location: listEvaluation.php');
+        header('Location: ListEvaluation.php');
         exit;
     } else {
         $error = "Veuillez remplir tous les champs.";

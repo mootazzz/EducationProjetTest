@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Validation des champs
     if (empty($titre) || empty($description) || empty($type) || empty($deadline) || empty($duration) || empty($courseId) || empty($teacherId)) {
-        $errorMessage = "Tous les champs sont obligatoires.";
+        $errorMessage = "";
     } elseif (!is_numeric($duration) || $duration <= 0) {
         $errorMessage = "La durée doit être un nombre positif.";
     } elseif (strtotime($deadline) < time()) {

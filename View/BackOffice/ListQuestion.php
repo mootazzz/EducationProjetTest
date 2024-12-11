@@ -1,10 +1,8 @@
 <?php
-include '../../controller/QuestionController.php'; // Inclure le contrôleur des questions
+include 'C:\xampp\htdocs\EducationProjetTest - testlekher\Controller\QuestionController.php'; // Inclure le contrôleur des questions
 $questionController = new QuestionController();
-$list = $questionController->listQuestions(); // Récupérer la liste des questions
-
+$list = $questionController->listQuestions();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -55,7 +53,7 @@ $list = $questionController->listQuestions(); // Récupérer la liste des questi
 
         table th {
             background-color: #4e54c8;
-            color: #ffffff;
+            color:  #0052cc;
         }
 
         table td {
@@ -95,37 +93,47 @@ $list = $questionController->listQuestions(); // Récupérer la liste des questi
 
 <body>
     <div class="container">
-        <h1>List Of Questions</h1>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Question ID</th>
-                    <th>Question Text</th>
-                    <th>Question Type</th>
-                    <th>Evaluation ID</th>
-                    <th colspan="2">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($list as $question): ?>
+        <h1>List of Questions</h1>
+        <?php if (!empty($list)): ?>
+            <table class="table table-bordered">
+                <thead>
                     <tr>
-                        <td><?= $question->getIdQuestion(); ?></td>
-                        <td><?= $question->getContenu(); ?></td>
-                        <td><?= $question->getType(); ?></td>
-                   
-                        <td>
-                            <form method="POST" action="updateQuestion.php">
-                                <input type="submit" name="update" value="Update" class="btn btn-warning btn-sm">
-                                <input type="hidden" value="<?= $question->getIdQuestion(); ?>" name="id">
-                            </form>
-                        </td>
-                        <td>
-                            <a href="#" onclick="confirmDelete(<?= $question->getIdQuestion(); ?>)" class="btn btn-danger btn-sm">Delete</a>
-                        </td>
+                        <th>Question ID</th>
+                        <th>Content</th>
+                        <th>Type</th>
+                        <th>Options</th>
+                        <th>Correct Answer</th>
+                        <th>Points</th>
+                        <th>Evaluation ID</th> <!-- Nouvelle colonne pour idEvaluation -->
+                        <th colspan="2">Actions</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($list as $question): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($question->getIdQuestion()); ?></td>
+                            <td><?= htmlspecialchars($question->getContenu()); ?></td>
+                            <td><?= htmlspecialchars($question->getType()); ?></td>
+                            <td><?= htmlspecialchars(implode(', ', $question->getOptions())); ?></td>
+                            <td><?= htmlspecialchars($question->getBonneReponse()); ?></td>
+                            <td><?= htmlspecialchars($question->getPoints()); ?></td>
+                            <td><?= htmlspecialchars($question->getIdEvaluation()); ?></td> <!-- Affichage de idEvaluation -->
+                            <td>
+                                <form method="POST" action="updateQuestion.php">
+                                    <input type="submit" name="update" value="Update" class="btn btn-warning btn-sm">
+                                    <input type="hidden" value="<?= htmlspecialchars($question->getIdQuestion()); ?>" name="id">
+                                </form>
+                            </td>
+                            <td>
+                                <a href="#" onclick="confirmDelete(<?= htmlspecialchars($question->getIdQuestion()); ?>)" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="text-center text-muted">No questions available.</p>
+        <?php endif; ?>
     </div>
 
     <script>
@@ -137,26 +145,6 @@ $list = $questionController->listQuestions(); // Récupérer la liste des questi
                 window.location.href = `DeleteQuestion.php?id=${id}`;
             }
         }
-
-        // Example validation for the update form (if fields are editable in the form)
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                const inputs = form.querySelectorAll('input, select, textarea');
-                let isValid = true;
-
-                inputs.forEach(input => {
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        alert(`Please fill the ${input.name} field.`);
-                        input.focus();
-                    }
-                });
-
-                if (!isValid) {
-                    event.preventDefault(); // Prevent form submission if validation fails
-                }
-            });
-        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
